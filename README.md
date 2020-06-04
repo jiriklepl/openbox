@@ -14,6 +14,8 @@ which compare the supplied integer value against the active window's in relative
 
 This is especially usefull when moving windows around with custom arrow binds like in Windows.
 
+That can be seen [here](./example_config/rc.xml.md)
+
 ## Simple example
 
 ```xml
