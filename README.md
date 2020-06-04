@@ -10,7 +10,7 @@ Added new conditions to the [If action's](http://openbox.org/wiki/Help:Actions#I
   - `min_height`
   - `max_height`
 
-which compare the supplied integer value against the active window's in relative numbers.
+which compare the supplied integer value against the active window's in relative numbers to the active screen.
 
 This is especially usefull when moving windows around with custom arrow binds like in Windows.
 
