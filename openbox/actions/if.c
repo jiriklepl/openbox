@@ -68,6 +68,14 @@ typedef struct {
     gboolean omnipresent_off;
     gboolean desktop_current;
     gboolean desktop_other;
+    guint    max_x;
+    guint    max_y;
+    guint    min_x;
+    guint    min_y;
+    guint    max_width;
+    guint    max_height;
+    guint    min_width;
+    guint    min_height;
     guint    desktop_number;
     guint    screendesktop_number;
     guint    client_monitor;
@@ -220,6 +228,31 @@ static void setup_query(Options* o, xmlNodePtr node, QueryTarget target) {
     if ((n = obt_xml_find_node(node, "monitor"))) {
         q->client_monitor = obt_xml_node_int(n);
     }
+
+    if ((n = obt_xml_find_node(node, "max_x"))) {
+        q->max_x = obt_xml_node_int(n);
+    }
+    if ((n = obt_xml_find_node(node, "max_y"))) {
+        q->max_y = obt_xml_node_int(n);
+    }
+    if ((n = obt_xml_find_node(node, "min_x"))) {
+        q->min_x = obt_xml_node_int(n);
+    }
+    if ((n = obt_xml_find_node(node, "min_y"))) {
+        q->min_y = obt_xml_node_int(n);
+    }
+    if ((n = obt_xml_find_node(node, "max_width"))) {
+        q->max_width = obt_xml_node_int(n);
+    }
+    if ((n = obt_xml_find_node(node, "max_height"))) {
+        q->max_height = obt_xml_node_int(n);
+    }
+    if ((n = obt_xml_find_node(node, "min_width"))) {
+        q->min_width = obt_xml_node_int(n);
+    }
+    if ((n = obt_xml_find_node(node, "min_height"))) {
+        q->min_height = obt_xml_node_int(n);
+    }
 }
 
 static gpointer setup_func(xmlNodePtr node)
@@ -304,6 +337,54 @@ static void free_func(gpointer options)
 
     g_array_unref(o->queries);
     g_slice_free(Options, o);
+}
+
+static gboolean compare_max_x(ObClient *target, guint x)
+{
+    const Rect *area = screen_physical_area_active();
+    return 100 * (target->area.x - area->x) / area->width <= x;
+}
+
+static gboolean compare_min_x(ObClient *target, guint x)
+{
+    const Rect *area = screen_physical_area_active();
+    return 100 * (target->area.x - area->x) / area->width >= x;
+}
+
+static gboolean compare_max_y(ObClient *target, guint y)
+{
+    const Rect *area = screen_physical_area_active();
+    return 100 * (target->area.y - area->y) / area->height <= y;
+}
+
+static gboolean compare_min_y(ObClient *target, guint y)
+{
+    const Rect *area = screen_physical_area_active();
+    return 100 * (target->area.y - area->y) / area->height >= y;
+}
+
+static gboolean compare_max_width(ObClient *target, guint width)
+{
+    const Rect *area = screen_physical_area_active();
+    return 100 * target->area.width / area->width <= width;
+}
+
+static gboolean compare_min_width(ObClient *target, guint width)
+{
+    const Rect *area = screen_physical_area_active();
+    return 100 * target->area.width / area->width >= width;
+}
+
+static gboolean compare_max_height(ObClient *target, guint height)
+{
+    const Rect *area = screen_physical_area_active();
+    return 100 * target->area.height / area->height <= height;
+}
+
+static gboolean compare_min_height(ObClient *target, guint height)
+{
+    const Rect *area = screen_physical_area_active();
+    return 100 * target->area.height / area->height >= height;
 }
 
 /* Always return FALSE because its not interactive */
@@ -412,6 +493,30 @@ static gboolean run_func_if(ObActionsData *data, gpointer options)
 
         if (q->client_monitor)
             is_true &= client_monitor(query_target) == q->client_monitor - 1;
+
+        if (q->max_x)
+            is_true &= compare_max_x(query_target, q->max_x);
+
+        if (q->max_y)
+            is_true &= compare_max_y(query_target, q->max_y);
+
+        if (q->max_width)
+            is_true &= compare_max_width(query_target, q->max_width);
+
+        if (q->max_height)
+            is_true &= compare_max_height(query_target, q->max_height);
+
+        if (q->min_x)
+            is_true &= compare_min_x(query_target, q->min_x);
+
+        if (q->min_y)
+            is_true &= compare_min_y(query_target, q->min_y);
+
+        if (q->min_width)
+            is_true &= compare_min_width(query_target, q->min_width);
+
+        if (q->min_height)
+            is_true &= compare_min_height(query_target, q->min_height);
 
     }
 
