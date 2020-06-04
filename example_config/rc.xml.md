@@ -1,7 +1,10 @@
 # Example Windows-like keybindings
 
+<<<<<<< HEAD
 This makes OpenBox behave almost like Windows
 
+=======
+>>>>>>> c30366b5f45d085d368d1549cb2ac6bf71a40af6
 ```xml
 <keyboard>
 
